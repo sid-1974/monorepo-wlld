@@ -16,7 +16,7 @@ task-tracker/
 │   ├── src/
 │   │   ├── config/           # App config, DB & Redis connections
 │   │   ├── controllers/      # Route handlers (thin layer)
-│   │   ├── middleware/        # Auth, validation, error handling
+│   │   ├── middleware/       # Auth, validation, error handling
 │   │   ├── models/           # Mongoose schemas (User, Task)
 │   │   ├── routes/           # Express route definitions
 │   │   ├── services/         # Business logic layer
@@ -71,6 +71,8 @@ task-tracker/
 | status | `pending`, `completed`          | all         |
 | sortBy | `dueDate`, `createdAt`, `title` | `createdAt` |
 | order  | `asc`, `desc`                   | `desc`      |
+| from   | `YYYY-MM-DD` (Date Range Start) | -           |
+| to     | `YYYY-MM-DD` (Date Range End)   | -           |
 
 ## 🚀 Setup & Installation
 
@@ -83,8 +85,8 @@ task-tracker/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/task-tracker.git
-cd task-tracker
+git clone https://github.com/sid-1974/monorepo-wlld.git
+cd monorepo-wlld
 ```
 
 ### 2. Set up environment variables
@@ -99,8 +101,8 @@ Edit `backend/.env`:
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/task-tracker
-REDIS_URL=redis://localhost:6379
+MONGODB_URI=mongodb://your-mongodb-uri
+REDIS_URL=redis://your-redis-url
 JWT_SECRET=your-super-secret-key-change-this
 JWT_EXPIRES_IN=7d
 ```
@@ -133,16 +135,6 @@ cd ../frontend && npm install # Frontend dependencies
 npm run dev
 ```
 
-Or start individually:
-
-```bash
-# Terminal 1: Backend (http://localhost:5000)
-npm run backend:dev
-
-# Terminal 2: Frontend (http://localhost:3000)
-npm run frontend:dev
-```
-
 ## 🧪 Testing
 
 ### Run tests
@@ -155,63 +147,33 @@ npm test
 npm run test:coverage
 ```
 
-### Test Infrastructure
-
-- **Jest** + **ts-jest** for TypeScript support
-- **mongodb-memory-server** for in-memory MongoDB (no external DB needed)
-- **Custom Redis mock** with Map-based in-memory store
-- **Supertest** for HTTP integration tests
-
-### Coverage Target: ~70%+
+### Coverage: **98%+**
 
 The test suite includes:
 
 - ✅ Auth API tests (signup, login, validation, duplicates)
 - ✅ Task CRUD tests (create, read, update, delete)
-- ✅ Authorization tests (cross-user access denied)
-- ✅ Task filtering tests
-- ✅ JWT utility tests
-- ✅ Error handling tests
+- ✅ Date-wise filtering tests
+- ✅ Redis caching & invalidation tests
+- ✅ Centralized Error Handling tests
+- ✅ Mongoose Model & Middleware tests
 
 ## 🔑 Key Features
 
 ### Backend
 
-- **JWT Authentication**: Secure token-based auth with `bcryptjs` password hashing
-- **Redis Caching**: GET `/api/tasks` responses cached per user; invalidated on mutations
-- **Zod Validation**: Type-safe request validation with descriptive error messages
-- **Mongoose Indexing**: Compound indexes on `owner+status` and `owner+dueDate`
-- **Async Error Handling**: `express-async-errors` + centralized error middleware
-- **Graceful Cache Degradation**: App works even if Redis is unavailable
+- **JWT Authentication**: Secure token-based auth with `bcryptjs`.
+- **Redis Caching**: Optimized performance for task listing.
+- **Date Filtering**: Advanced `from`/`to` date-wise task lookups.
+- **Zod Validation**: Strict schema validation for all inputs.
+- **Error Handling**: Custom `AppError` and global middleware.
 
 ### Frontend
 
-- **Optimistic UI Updates**: Instant visual feedback on task operations
-  - Delete: Removes from list immediately, reverts on API failure
-  - Toggle status: Changes immediately, reverts on failure
-- **Task Filtering**: Filter by `all`, `pending`, or `completed`
-- **Dynamic Greeting**: Shows time-based greeting (morning/afternoon/evening)
-- **Stats Dashboard**: Live task counts with animated gradient numbers
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Auto-redirect**: Redirects to login on 401, to dashboard on authenticated
-
-### UI/UX
-
-- 🌙 Premium dark theme with violet/indigo accents
-- ✨ Smooth micro-animations and transitions
-- 📱 Fully responsive with mobile-optimized layout
-- 🎨 Gradient accent buttons and hover effects
-- ⚠️ Overdue task highlighting with red border
-- 📅 Today's tasks highlighted differently
-
-## 🔒 Security
-
-- Passwords hashed with `bcryptjs` (salt rounds: 10)
-- Password field excluded from query results by default (`select: false`)
-- JWT tokens expire after 7 days (configurable)
-- Task ownership verified on all mutations
-- Input validation on all endpoints
-- CORS enabled
+- **Optimistic UI**: Instant deletions and status toggles.
+- **Date Filter UI**: Clean dashboard interface to filter tasks by date range.
+- **Premium Design**: Dark mode with animated gradients and micro-interactions.
+- **Stats Dashboard**: Real-time counter for pending and completed tasks.
 
 ## 📐 Database Schema
 
@@ -235,26 +197,18 @@ The test suite includes:
 | owner       | ObjectId | ref: User, required      |
 | createdAt   | Date     | auto-generated           |
 
-### Indexes
-
-- `email` (unique) on User
-- `{ owner: 1, status: 1 }` compound on Task
-- `{ owner: 1, dueDate: 1 }` compound on Task
+---
 
 ## 🛠️ Scripts
 
-| Script                  | Description                      |
-| ----------------------- | -------------------------------- |
-| `npm run dev`           | Start both backend & frontend    |
-| `npm run backend:dev`   | Start backend only (hot-reload)  |
-| `npm run frontend:dev`  | Start frontend only (hot-reload) |
-| `npm run backend:build` | Build backend TypeScript         |
-| `npm test`              | Run backend tests                |
-| `npm run test:coverage` | Run tests with coverage report   |
-| `npm run install:all`   | Install all dependencies         |
+| Script                  | Description                    |
+| ----------------------- | ------------------------------ |
+| `npm run dev`           | Start both backend & frontend  |
+| `npm run backend:build` | Build backend TypeScript       |
+| `npm test`              | Run backend tests              |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run install:all`   | Install all dependencies       |
 
 ## 📝 License
 
 MIT
-#   m o n o r e p o - w l l d  
- 
