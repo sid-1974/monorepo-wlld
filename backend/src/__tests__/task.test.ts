@@ -98,6 +98,16 @@ describe("Task API", () => {
       expect(res.body.data).toHaveLength(3);
     });
 
+    it("should return tasks from cache on subsequent calls", async () => {
+      // First call to populate cache
+      await request.get("/api/tasks").set(authHeaders(token));
+
+      // Second call should hit cache
+      const res = await request.get("/api/tasks").set(authHeaders(token));
+      expect(res.status).toBe(200);
+      expect(res.body.data).toHaveLength(3);
+    });
+
     it("should filter tasks by status", async () => {
       const res = await request
         .get("/api/tasks?status=pending")
@@ -161,6 +171,19 @@ describe("Task API", () => {
       expect(res.status).toBe(200);
       expect(res.body.data.title).toBe("Updated Title");
       expect(res.body.data.status).toBe("completed");
+    });
+
+    it("should update task dueDate", async () => {
+      const newDate = "2027-01-01";
+      const res = await request
+        .put(`/api/tasks/${taskId}`)
+        .set(authHeaders(token))
+        .send({ dueDate: newDate });
+
+      expect(res.status).toBe(200);
+      expect(new Date(res.body.data.dueDate).toISOString().split("T")[0]).toBe(
+        newDate,
+      );
     });
 
     it("should not update another user's task", async () => {
