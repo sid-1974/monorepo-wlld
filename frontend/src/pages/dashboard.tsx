@@ -14,6 +14,8 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<TaskFilter>("all");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -28,14 +30,18 @@ export default function DashboardPage() {
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await taskApi.getAll(filter);
+      const res = await taskApi.getAll({
+        status: filter,
+        from: dateFrom,
+        to: dateTo,
+      });
       setTasks(res.data.data);
     } catch (err) {
       console.error("Failed to fetch tasks:", err);
     } finally {
       setLoading(false);
     }
-  }, [filter]);
+  }, [filter, dateFrom, dateTo]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -159,21 +165,59 @@ export default function DashboardPage() {
       </div>
 
       {/* Filter */}
-      <div className={styles.filterBar}>
-        {(["all", "pending", "completed"] as TaskFilter[]).map((f) => (
-          <button
-            key={f}
-            className={filter === f ? styles.filterBtnActive : styles.filterBtn}
-            onClick={() => setFilter(f)}
-            id={`filter-${f}`}
-          >
-            {f === "all"
-              ? "All Tasks"
-              : f === "pending"
-                ? "◷ Pending"
-                : "✓ Completed"}
-          </button>
-        ))}
+      <div className={styles.filterSection}>
+        <div className={styles.filterBar}>
+          {(["all", "pending", "completed"] as TaskFilter[]).map((f) => (
+            <button
+              key={f}
+              className={
+                filter === f ? styles.filterBtnActive : styles.filterBtn
+              }
+              onClick={() => setFilter(f)}
+              id={`filter-${f}`}
+            >
+              {f === "all"
+                ? "All Tasks"
+                : f === "pending"
+                  ? "◷ Pending"
+                  : "✓ Completed"}
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.dateFilterContainer}>
+          <div className={styles.dateInputGroup}>
+            <label htmlFor="dateFrom">From:</label>
+            <input
+              type="date"
+              id="dateFrom"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className={styles.dateInput}
+            />
+          </div>
+          <div className={styles.dateInputGroup}>
+            <label htmlFor="dateTo">To:</label>
+            <input
+              type="date"
+              id="dateTo"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className={styles.dateInput}
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <button
+              className={styles.clearFilterBtn}
+              onClick={() => {
+                setDateFrom("");
+                setDateTo("");
+              }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Task List */}

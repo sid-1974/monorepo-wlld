@@ -13,6 +13,8 @@ const buildCacheKey = (userId: string, query?: TaskQueryInput): string => {
   if (query?.status) parts.push(`status:${query.status}`);
   if (query?.sortBy) parts.push(`sort:${query.sortBy}`);
   if (query?.order) parts.push(`order:${query.order}`);
+  if (query?.from) parts.push(`from:${query.from}`);
+  if (query?.to) parts.push(`to:${query.to}`);
   return parts.join(":");
 };
 
@@ -32,6 +34,13 @@ export class TaskService {
     // Build query
     const filter: Record<string, any> = { owner: userId };
     if (query.status) filter.status = query.status;
+
+    // Date range filter
+    if (query.from || query.to) {
+      filter.dueDate = {};
+      if (query.from) filter.dueDate.$gte = new Date(query.from);
+      if (query.to) filter.dueDate.$lte = new Date(query.to);
+    }
 
     const sortField = query.sortBy || "createdAt";
     const sortOrder = query.order === "asc" ? 1 : -1;

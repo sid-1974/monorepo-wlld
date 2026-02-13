@@ -230,6 +230,85 @@
   color: white;
 }
 
+.filterSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  animation: slideUp 0.5s ease 0.1s both;
+}
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0 !important;
+}
+
+.dateFilterContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.dateInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dateInputGroup label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dateInput {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+.clearFilterBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--danger);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.clearFilterBtn:hover {
+  background: var(--danger-bg);
+}
+
+/* @media for filter section */
+@media (max-width: 900px) {
+  .filterSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* Task Grid */
 .taskGrid {
   display: grid;

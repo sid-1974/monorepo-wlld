@@ -29,11 +29,9 @@ export const createTaskSchema = z.object({
     .default("")
     .optional(),
   status: z.enum(["pending", "completed"]).default("pending").optional(),
-  dueDate: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), {
-      message: "Please provide a valid date",
-    }),
+  dueDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Please provide a valid date",
+  }),
 });
 
 export const updateTaskSchema = z.object({
@@ -63,6 +61,8 @@ export const taskQuerySchema = z.object({
     .default("createdAt")
     .optional(),
   order: z.enum(["asc", "desc"]).default("desc").optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
 });
 
 // Type inference for reuse

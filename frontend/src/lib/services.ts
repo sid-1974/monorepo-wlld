@@ -12,10 +12,14 @@ export const authApi = {
 
 // Task endpoints
 export const taskApi = {
-  getAll: (status?: string) =>
-    api.get<ApiResponse<Task[]>>("/tasks", {
-      params: status && status !== "all" ? { status } : {},
-    }),
+  getAll: (filters: { status?: string; from?: string; to?: string } = {}) => {
+    const params: any = {};
+    if (filters.status && filters.status !== "all")
+      params.status = filters.status;
+    if (filters.from) params.from = filters.from;
+    if (filters.to) params.to = filters.to;
+    return api.get<ApiResponse<Task[]>>("/tasks", { params });
+  },
 
   create: (data: TaskFormData) => api.post<ApiResponse<Task>>("/tasks", data),
 

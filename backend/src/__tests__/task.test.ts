@@ -130,6 +130,21 @@ describe("Task API", () => {
       expect(res.body.data[0].status).toBe("completed");
     });
 
+    it("should filter tasks by date range", async () => {
+      // Setup: 3 tasks are created in beforeEach with dates:
+      // Task 1: 2026-06-01
+      // Task 2: 2026-07-01
+      // Task 3: 2026-08-01
+
+      const res = await request
+        .get("/api/tasks?from=2026-06-15&to=2026-07-15")
+        .set(authHeaders(token));
+
+      expect(res.status).toBe(200);
+      expect(res.body.data).toHaveLength(1);
+      expect(res.body.data[0].title).toBe("Task 2");
+    });
+
     it("should not return tasks from other users", async () => {
       const otherUser = await createTestUser({
         email: "other@example.com",
