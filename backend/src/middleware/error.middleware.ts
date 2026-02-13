@@ -1,66 +1,42 @@
 import { Request, Response, NextFunction } from "express";
 
-// Custom error class for API errors
-export class AppError extends Error {
-  public statusCode: number;
-  public isOperational: boolean;
-
-  constructor(message: string, statusCode: number) {
-    super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
-// Centralized error handler middleware
 export const errorHandler = (
-  err: Error | AppError,
+  err: any,
   _req: Request,
   res: Response,
   _next: NextFunction,
-): void => {
-  if (err instanceof AppError) {
-    res.status(err.statusCode).json({
-      success: false,
-      message: err.message,
-    });
-    return;
-  }
+) => {
+  // CRITICAL: Log the error for Vercel/Production debugging
+  console.error("🔥 ERROR:", err);
+
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
 
   // Mongoose validation error
   if (err.name === "ValidationError") {
-    const messages = Object.values((err as any).errors).map(
-      (e: any) => e.message,
-    );
-    res.status(400).json({
-      success: false,
-      message: messages.join(", "),
-    });
-    return;
+    statusCode = 400;
+    message = Object.values(err.errors)
+      .map((e: any) => e.message)
+      .join(", ");
   }
 
   // Mongoose duplicate key error
-  if ((err as any).code === 11000) {
-    res.status(409).json({
-      success: false,
-      message: "Duplicate field value. Please use another value.",
-    });
-    return;
+  if (err.code === 11000) {
+    statusCode = 409;
+    const field = Object.keys(err.keyValue)[0];
+    message = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
   }
 
-  // Mongoose cast error (invalid ObjectId)
+  // Mongoose cast error (invalid ID)
   if (err.name === "CastError") {
-    res.status(400).json({
-      success: false,
-      message: "Invalid ID format",
-    });
-    return;
+    statusCode = 400;
+    message = `Invalid ${err.path}: ${err.value}`;
   }
 
-  console.error("❌ Unhandled error:", err);
-  res.status(500).json({
+  res.status(statusCode).json({
     success: false,
-    message: "Internal server error",
+    message,
+    // Include stack trace only in development
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
   });
 };
