@@ -90,7 +90,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
                 id="name"
                 type="text"
                 className={styles.input}
-                placeholder="John Doe"
+                placeholder="Enter Your Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -107,7 +107,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
               id="email"
               type="email"
               className={styles.input}
-              placeholder="you@example.com"
+              placeholder="Enter Your Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
