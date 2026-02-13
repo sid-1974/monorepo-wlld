@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema } from "zod";
-import { AppError } from "./error.middleware";
+import { AppError } from "./app-error";
 
 // Reusable validation middleware using Zod
 export const validate =
