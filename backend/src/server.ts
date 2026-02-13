@@ -9,15 +9,24 @@ const start = async (): Promise<void> => {
     await connectDB();
     await getRedisClient();
 
-    // Start server
-    app.listen(config.port, () => {
-      console.log(`🚀 Server running on http://localhost:${config.port}`);
-      console.log(`📋 Health check: http://localhost:${config.port}/health`);
-    });
+    // Start server only if not running in Vercel environment
+    if (process.env.VERCEL !== "1") {
+      app.listen(config.port, () => {
+        console.log(`🚀 Server running on http://localhost:${config.port}`);
+        console.log(`📋 Health check: http://localhost:${config.port}/health`);
+      });
+    }
   } catch (error) {
     console.error("❌ Failed to start server:", error);
-    process.exit(1);
+    if (process.env.VERCEL !== "1") {
+      process.exit(1);
+    }
   }
 };
 
-start();
+// Check if we are in Vercel – if not, run the start function
+if (process.env.VERCEL !== "1") {
+  start();
+}
+
+export default app;

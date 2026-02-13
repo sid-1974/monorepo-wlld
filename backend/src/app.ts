@@ -3,8 +3,16 @@ import cors from "cors";
 import "express-async-errors";
 import routes from "./routes";
 import { errorHandler } from "./middleware";
+import { connectDB } from "./config/database";
+import { getRedisClient } from "./config/redis";
 
 const app = express();
+
+// Establish DB connections (for Serverless cold starts)
+connectDB().catch((err) => console.error("Initial DB connect failed:", err));
+getRedisClient().catch((err) =>
+  console.error("Initial Redis connect failed:", err),
+);
 
 // Global middleware
 app.use(cors());
