@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import "express-async-errors";
 import routes from "./routes";
@@ -8,24 +8,35 @@ import { getRedisClient } from "./config/redis";
 
 const app = express();
 
-// Establish DB connections (for Serverless cold starts)
-connectDB().catch((err) => console.error("Initial DB connect failed:", err));
-getRedisClient().catch((err) =>
-  console.error("Initial Redis connect failed:", err),
-);
+// Connection Middleware for Serverless
+const connectionGuard = async (
+  _req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Await both connections before proceeding
+    await connectDB();
+    await getRedisClient();
+    next();
+  } catch (error) {
+    console.error("❌ Database connection failed in middleware:", error);
+    next(error);
+  }
+};
 
 // Global middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
+// Apply connection guard to all API routes
+app.use("/api", connectionGuard, routes);
+
+// Health check (bypasses guard for speed)
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
-
-// API routes
-app.use("/api", routes);
 
 // 404 handler
 app.use((_req, res) => {
